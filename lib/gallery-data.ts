@@ -5,7 +5,7 @@ export const galleryCollections: { id: string; label: string; title: string; sum
     id: "family",
     label: "משפחה",
     title: "סיפור של בית",
-    summary: "האחים, התינוק החדש, הצחוק שלפני ארוחת שבת — מי שיושב סביב השולחן שלכם, בתמונות שתרצו לתלות על הקיר.",
+    summary: "האחים, התינוק החדש, הצחוק שלפני ארוחת שבת - מי שיושב סביב השולחן שלכם, בתמונות שתרצו לתלות על הקיר.",
     images: [
       { src: "/images/mirit/mirit-03.jpg", alt: "הורים וילדים הולכים יחד יד ביד ליד בקתת עץ" },
       { src: "/images/mirit/mirit-08.jpg", alt: "שני ילדים מתחבקים על הכביש, אחת עם כובע ג'ינס ועל סקייטבורד" },

@@ -10,8 +10,8 @@ import { galleryCollections, type GalleryImage } from "@/lib/gallery-data";
 
 const sessions = [
   { number: "01", id: "family", title: "משפחה", text: "שעה של ביחד, בלי לחץ ובלי פוזות מאולצות. הכוונה עדינה כשצריך, ומקום לכל מה שקורה באמת." },
-  { number: "02", id: "chalake", title: "חלאקה", text: "התלתלים, המספריים, הכיפה הראשונה והציציות החדשות — יום שעובר מהר מדי. בבית, בסטודיו או בחוץ." },
-  { number: "03", id: "bat-mitzvah", title: "בת מצווה", text: "צילום שבונה ביטחון: היא בוחרת את הסגנון, ואני דואגת שתרגיש בנוח ותיראה בדיוק כמו עצמה." },
+  { number: "02", id: "chalake", title: "חלאקה", text: "אוטוטו ונגזזת הרעמה, רגעים אחרונים לפני שהוא גדול" },
+  { number: "03", id: "bat-mitzvah", title: "בת מצווה", text: "חוויה שמעלה שלב, מילדות קלילה וכיפית לבגרות ורצינות, אנחנו על התפר" },
 ];
 
 type Shape = "portrait" | "landscape";
@@ -52,7 +52,7 @@ const collageShapes = collagePhotoTiles.map((tile) => tile.shape);
 
 // Placeholder quotes: replace with real testimonials before going live.
 const testimonials = [
-  { quote: "הגענו לחוצים, עם שלושה ילדים ותינוק. יצאנו עם תמונות שבהן כולנו נראים בדיוק כמו שאנחנו — רק יפים יותר.", author: "[שם הלקוחה]", type: "צילום משפחה" },
+  { quote: "הגענו לחוצים, עם שלושה ילדים ותינוק. יצאנו עם תמונות שבהן כולנו נראים בדיוק כמו שאנחנו - רק יפים יותר.", author: "[שם הלקוחה]", type: "צילום משפחה" },
   { quote: "בחלאקה היה רעש, אורחים והתרגשות. מירית הייתה שם בשקט ותפסה כל רגע, גם את אלה שבכלל לא ראינו.", author: "[שם הלקוחה]", type: "חלאקה" },
   { quote: "הבת שלי לא אוהבת להצטלם. אחרי עשר דקות היא כבר צחקה, והתמונות יצאו הכי היא שיש.", author: "[שם הלקוחה]", type: "בת מצווה" },
 ];
@@ -156,7 +156,7 @@ export default function Home() {
           <div className="hero-content">
             <p className="eyebrow mb-7">צילום משפחה · חלאקה · בת מצווה</p>
             <h1 className="display-title">הרגעים הקטנים<br />הם הסיפור.</h1>
-            <p className="hero-lead mt-7 max-w-lg text-[1.05rem] leading-8 sm:text-lg">צילום טבעי ורגוע, באור רך ובקצב של הילדים — תמונות שיישארו הרבה אחרי שהבגדים כבר יהיו קטנים.</p>
+            <p className="hero-lead mt-7 max-w-lg text-[1.05rem] leading-8 sm:text-lg">צילום טבעי ורגוע, באור רך ובקצב של הילדים - תמונות שיישארו הרבה אחרי שהתפאורה כבר לא תהיה רלוונטית...</p>
             <a href="/gallery" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
           </div>
           <div className="hero-media">
@@ -176,7 +176,7 @@ export default function Home() {
               <p className="eyebrow mt-6 text-[var(--honey-light)]">נעים להכיר</p>
               <h2 className="section-title mt-5 text-white">שלום, אני מירית.</h2>
               <div className="mt-6 space-y-4 text-[.95rem] leading-7 text-white/70">
-                <p>אני מירית, צלמת ילדים ומשפחה מבני ברק, עם אהבה גדולה לצילום ולתקשורת עם ילדים. אני מצלמת ומסריטה משפחות, חלאקות ובנות מצווה, ומלווה אתכם מרגע שיחת ההכרות ועד התוצר המושלם אצלכם בבית: תמונות ואלבום שלא מפסיקים לדפדף בו.</p>
+                <p>צלמת ילדים ומשפחה, עם אהבה גדולה לצילום ולתקשורת עם ילדים. אני מצלמת ומסריטה משפחות, חלאקות ובת מצוות, ומלווה אתכם מהרגע הראשון של שיחת ההכרות ועד התוצר המושלם אצלכם בבית: תמונות ואלבום שלא מפסיקים לדפדף בו.</p>
                 <p>הילדים שלכם הם ההנאה שלי! אני יוצרת רגעים מיוחדים איתם ותופסת אותם ברגע הכי משוחרר והכי טוב, כדי שתקבלו את המזכרת המושלמת והמקצועית ביותר.</p>
               </div>
               <a href="#contact" className="dark-link mt-8 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
@@ -279,7 +279,7 @@ export default function Home() {
           <div className="contact-heading">
             <p className="section-kicker">מתחילים מכאן</p>
             <h2 className="contact-title mt-5">יש רגע שאתם רוצים לשמור?</h2>
-            <p className="contact-intro mt-6 max-w-2xl text-base leading-8 sm:text-lg">ספרו לי קצת עליכם — מי מצטלם, מה האירוע ומתי. אחזור אליכם עם רעיונות למיקום, לשעה וללבוש, ונבנה יחד צילום שמתאים בדיוק לכם.</p>
+            <p className="contact-intro mt-6 max-w-2xl text-base leading-8 sm:text-lg">ספרו לי קצת עליכם - מי מצטלם, מה האירוע ומתי. אחזור אליכם עם רעיונות למיקום, לשעה וללבוש, ונבנה יחד צילום שמתאים בדיוק לכם.</p>
           </div>
 
           <div className="contact-panel stagger-item mt-14">
@@ -287,7 +287,7 @@ export default function Home() {
               <div>
                 <p className="contact-aside-kicker">MB PHOTOGRAPHER</p>
                 <h3>בואו נשמור<br />את זה קרוב.</h3>
-                <p className="contact-aside-text">כל פנייה מקבלת ממני תשובה אישית — לא הודעה אוטומטית — עם כמה שאלות קצרות שיעזרו לנו לתכנן נכון.</p>
+                <p className="contact-aside-text">כל פנייה מקבלת ממני תשובה אישית - לא הודעה אוטומטית - עם כמה שאלות קצרות שיעזרו לנו לתכנן נכון.</p>
               </div>
               <div className="contact-details">
                 {/* Shown only for now: not a mailto link until the site goes live */}
