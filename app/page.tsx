@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Mail, Phone, Play, Plus, X } from "lucide-react";
-import { A11yMenu, SkipLinks } from "@/components/a11y-controls";
-import { AccessibilityStatement, PrivacyPolicy } from "@/components/legal-content";
-import { LegalDialog } from "@/components/legal-dialog";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import { ArrowLeft, Mail, Phone } from "lucide-react";
+import { SiteFooter, SiteHeader, SkipLinks } from "@/components/site-chrome";
+import { SessionsShowcase } from "@/components/sessions-showcase";
+import { CheckedImage, isImageBlocked } from "@/components/checked-image";
+import { Lightbox } from "@/components/lightbox";
+import { galleryCollections, type GalleryImage } from "@/lib/gallery-data";
 
 const sessions = [
   { number: "01", id: "family", title: "משפחה", text: "שעה של ביחד, בלי לחץ ובלי פוזות מאולצות. הכוונה עדינה כשצריך, ומקום לכל מה שקורה באמת." },
@@ -12,78 +14,26 @@ const sessions = [
   { number: "03", id: "bat-mitzvah", title: "בת מצווה", text: "צילום שבונה ביטחון: היא בוחרת את הסגנון, ואני דואגת שתרגיש בנוח ותיראה בדיוק כמו עצמה." },
 ];
 
-type GalleryImage = { src: string; alt: string };
+type Shape = "portrait" | "landscape";
 
-const galleryCollections: { id: string; label: string; title: string; summary: string; images: GalleryImage[]; youtubeId?: string }[] = [
-  {
-    id: "family",
-    label: "משפחה",
-    title: "סיפור של בית",
-    summary: "האחים, התינוק החדש, הצחוק שלפני ארוחת שבת — מי שיושב סביב השולחן שלכם, בתמונות שתרצו לתלות על הקיר.",
-    images: [
-      { src: "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg", alt: "שלושה אחים יחד בעריסת קש" },
-      { src: "/images/5X3A6715-2.JPG", alt: "ילדה מחייכת יושבת על ארגז עץ בשדרת עצים" },
-      { src: "/images/4W3A8180_%282%29.jpg", alt: "תינוקת שוכבת על כרית ורודה ומביטה למעלה" },
-      { src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", alt: "ילדה עם תלתלים בסרבל עומדת בשביל בפארק" },
-      { src: "/images/אילה%20וויג%20צלמת%20ניו%20בורן%20בבית%20הלקוח%20054-8524765%20%281%29.jpg", alt: "ילדה בכובע סרוג ליד אחיה התינוק בעריסה" },
-      { src: "/images/collage/collage-07.jpg", alt: "ילד צוחק יושב על המדרכה ליד אוטובוס צעצוע אדום" },
-    ],
-  },
-  {
-    id: "chalake",
-    label: "חלאקה",
-    title: "התספורת הראשונה",
-    summary: "שלוש שנים של תלתלים, רגע אחד של מספריים. ההתרגשות, החיוך הנבוך, והמבט הראשון במראה.",
-    images: [
-      { src: "/images/hero-family.jpeg", alt: "שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" },
-      { src: "/images/collage/collage-19.jpg", alt: "ילד במשקפי שמש יושב על ספסל עץ ליד אוטובוס צעצוע" },
-      { src: "/images/collage/collage-10.jpg", alt: "ילד עם אוזניות וסקייטבורד צוחק מול קיר גרפיטי" },
-    ],
-  },
-  {
-    id: "bat-mitzvah",
-    label: "בת מצווה",
-    title: "היא כבר גדולה",
-    summary: "בגיל הזה כל אחת רוצה להיראות כמו עצמה, רק בגרסה הכי בטוחה. בטבע, בסטודיו או בעיר.",
-    images: [],
-    youtubeId: "bG3QSC4DuMc",
-  },
+// Photos of the inspiration strip (the marquee rows and the lightbox); the hero, about and session photos are left out so nothing repeats on the home page
+const collagePhotoTiles: (GalleryImage & { shape: Shape })[] = [
+  { src: "/images/collage/collage-17.jpg", alt: "ילדה בשמלה צהובה שוכבת על ספסל אבן ומחייכת", shape: "landscape" },
+  { src: "/images/collage/collage-05.jpg", alt: "ילד מתולתל עם כיפה יושב על קיר אבן ומחזיק ספר תורה קטן", shape: "portrait" },
+  { src: "/images/mirit/mirit-05.jpg", alt: "שתי אחיות מתחבקות ליד חבילות קש, הגדולה מנשקת את הקטנה", shape: "landscape" },
+  { src: "/images/collage/collage-13.jpg", alt: "שתי אחיות בכובעים בין חבילות קש", shape: "landscape" },
+  { src: "/images/collage/collage-10.jpg", alt: "ילד עם אוזניות וסקייטבורד צוחק מול קיר גרפיטי", shape: "portrait" },
+  { src: "/images/mirit/mirit-03.jpg", alt: "הורים וילדים הולכים יחד יד ביד ליד בקתת עץ", shape: "landscape" },
+  { src: "/images/collage/collage-07.jpg", alt: "ילד צוחק יושב על המדרכה ליד אוטובוס צעצוע אדום", shape: "landscape" },
+  { src: "/images/collage/collage-11.jpg", alt: "ילד בכובע בוקרים נשען על גזע עץ", shape: "portrait" },
+  { src: "/images/mirit/mirit-06.jpg", alt: "שלושה אחים בבגדים לבנים שוכבים יחד על הדשא ומביטים למעלה", shape: "landscape" },
+  { src: "/images/collage/collage-19.jpg", alt: "ילד במשקפי שמש יושב על ספסל עץ ליד אוטובוס צעצוע", shape: "landscape" },
+  { src: "/images/collage/collage-12.jpg", alt: "ילד בכובע וחולצה משובצת צועד בשביל", shape: "landscape" },
+  { src: "/images/collage/collage-20.jpg", alt: "ילדה בקפוצ'ון מרססת על קיר גרפיטי", shape: "landscape" },
 ];
 
-// Explicit grid areas so the collage closes with no holes: `d` = 6-column desktop, `m` = 2-column mobile.
-// `order` sets the (deliberately scattered) reveal sequence.
-type CollageTile =
-  | { kind: "photo"; src: string; alt: string; d: string; m: string; order: number }
-  | { kind: "word"; text: string; d: string; m: string; order: number }
-  | { kind: "link"; d: string; m: string; order: number };
-
-const collageTiles: CollageTile[] = [
-  { kind: "photo", src: "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg", alt: "שלושה אחים יחד בעריסת קש", d: "1 / 1 / span 2 / span 2", m: "1 / 1", order: 0 },
-  { kind: "photo", src: "/images/collage/collage-05.jpg", alt: "ילד מתולתל עם כיפה יושב על קיר אבן ומחזיק ספר תורה קטן", d: "1 / 3 / span 2 / span 1", m: "1 / 2 / span 2", order: 4 },
-  { kind: "photo", src: "/images/collage/collage-07.jpg", alt: "ילד צוחק יושב על המדרכה ליד אוטובוס צעצוע אדום", d: "1 / 4 / span 2 / span 2", m: "4 / 2", order: 2 },
-  { kind: "word", text: "משפחה", d: "1 / 6 / span 2 / span 1", m: "2 / 1", order: 15 },
-  { kind: "photo", src: "/images/collage/collage-13.jpg", alt: "שתי אחיות בכובעים בין חבילות קש", d: "3 / 1 / span 2 / span 4", m: "3 / 1 / span 1 / span 2", order: 6 },
-  { kind: "photo", src: "/images/collage/collage-17.jpg", alt: "ילדה בשמלה צהובה שוכבת על ספסל אבן ומחייכת", d: "3 / 5 / span 2 / span 2", m: "5 / 2", order: 1 },
-  { kind: "photo", src: "/images/collage/collage-10.jpg", alt: "ילד עם אוזניות וסקייטבורד צוחק מול קיר גרפיטי", d: "5 / 1 / span 2 / span 1", m: "4 / 1 / span 2", order: 9 },
-  { kind: "photo", src: "/images/collage/collage-20.jpg", alt: "ילדה בקפוצ'ון מרססת על קיר גרפיטי", d: "7 / 5 / span 2 / span 2", m: "9 / 1", order: 5 },
-  { kind: "word", text: "אהבה", d: "5 / 5 / span 2 / span 1", m: "6 / 2", order: 16 },
-  { kind: "word", text: "שמחה", d: "7 / 3 / span 2 / span 1", m: "10 / 1", order: 17 },
-  { kind: "photo", src: "/images/collage/collage-11.jpg", alt: "ילד בכובע בוקרים נשען על גזע עץ", d: "5 / 4 / span 2 / span 1", m: "7 / 1 / span 2", order: 3 },
-  { kind: "photo", src: "/images/4W3A8180_%282%29.jpg", alt: "תינוקת שוכבת על כרית ורודה ומביטה למעלה", d: "7 / 1 / span 2 / span 2", m: "7 / 2", order: 11 },
-  { kind: "photo", src: "/images/collage/collage-19.jpg", alt: "ילד במשקפי שמש יושב על ספסל עץ ליד אוטובוס צעצוע", d: "5 / 2 / span 2 / span 2", m: "6 / 1", order: 7 },
-  { kind: "photo", src: "/images/5X3A6715-2.JPG", alt: "ילדה מחייכת יושבת על ארגז עץ בשדרת עצים", d: "5 / 6 / span 2 / span 1", m: "8 / 2 / span 2", order: 13 },
-  { kind: "photo", src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", alt: "ילדה עם תלתלים בסרבל עומדת בשביל בפארק", d: "7 / 4 / span 2 / span 1", m: "11 / 2 / span 2", order: 8 },
-  { kind: "photo", src: "/images/collage/collage-12.jpg", alt: "ילד בכובע וחולצה משובצת צועד בשביל", d: "9 / 1 / span 2 / span 2", m: "10 / 2", order: 12 },
-  { kind: "photo", src: "/images/אילה%20וויג%20צלמת%20ניו%20בורן%20בבית%20הלקוח%20054-8524765%20%281%29.jpg", alt: "ילדה בכובע סרוג ליד אחיה התינוק בעריסה", d: "9 / 3 / span 2 / span 2", m: "11 / 1", order: 10 },
-  { kind: "link", d: "9 / 5 / span 2 / span 2", m: "12 / 1", order: 14 },
-];
-
-// Words are written one after another, in this order
-const collageWords = collageTiles.flatMap((tile) => tile.kind === "word" ? [tile.text] : []);
-const collagePhotoTiles = collageTiles.flatMap((tile) => tile.kind === "photo" ? [tile] : []);
-
-const HERO_SRC = "/images/hero-sisters.jpg";
-const ABOUT_SRC = "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg";
+const HERO_SRC = "/images/mirit/mirit-01.jpg";
+const ABOUT_SRC = "/images/mirit/mirit-04.jpg";
 // Safe replacements for the two CSS background photos (must match the .is-filtered rules in globals.css)
 const BACKGROUND_FALLBACKS: Record<string, string> = {
   [HERO_SRC]: "/images/collage/collage-19.jpg",
@@ -92,94 +42,13 @@ const BACKGROUND_FALLBACKS: Record<string, string> = {
 
 // Images that pass the common Israeli content filters (checked by the photographer on a filtered line).
 // Any image the viewer's filter blocks is swapped in place for one of these; repeats are fine for now.
-type Shape = "portrait" | "landscape";
 const FILTER_SAFE_IMAGES: { src: string; shape: Shape }[] = [
   { src: "/images/collage/collage-07.jpg", shape: "landscape" },
   { src: "/images/collage/collage-10.jpg", shape: "portrait" },
   { src: "/images/collage/collage-19.jpg", shape: "landscape" },
-  { src: "/images/5X3A6715-2.JPG", shape: "portrait" },
-  { src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", shape: "portrait" },
 ];
 const safeImageAlt = (src: string) => collagePhotoTiles.find((tile) => tile.src === src)?.alt ?? "";
-// A collage slot spanning two or more desktop columns is landscape
-const collageShapes = collagePhotoTiles.map((tile): Shape => Number(tile.d.split("span").pop()) >= 2 ? "landscape" : "portrait");
-
-// Content filters (נטיב, רימון, NetFree) replace a blocked image with a 3x3 mosaic of flat colour blocks,
-// with an icon in the centre. A real photo never has nearly every block perfectly flat.
-// NetFree shows a 5x5 mosaic while an image is only "sent for review"; those are deliberately left
-// in place (the photographer prefers to wait for approval), so only the 3x3 grid is checked.
-function isMosaic(img: HTMLImageElement) {
-  try {
-    const size = 120;
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return false;
-    ctx.drawImage(img, 0, 0, size, size);
-    const { data } = ctx.getImageData(0, 0, size, size);
-    const isFlat = (x0: number, y0: number, cell: number) => {
-      // Sample the inside of the block, away from the edges where JPEG blends neighbours
-      const margin = Math.round(cell / 4);
-      const values: number[] = [];
-      for (let y = y0 + margin; y < y0 + cell - margin; y++) {
-        for (let x = x0 + margin; x < x0 + cell - margin; x++) {
-          const i = (y * size + x) * 4;
-          values.push(data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
-        }
-      }
-      const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-      const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
-      return Math.sqrt(variance) < 3;
-    };
-    return [3].some((grid) => {
-      const cell = size / grid;
-      let flatCells = 0;
-      for (let row = 0; row < grid; row++) {
-        for (let col = 0; col < grid; col++) {
-          if (isFlat(col * cell, row * cell, cell)) flatCells++;
-        }
-      }
-      // The icon covers the centre block (or the four centre blocks on an even grid)
-      return flatCells >= grid * grid - (grid % 2 === 1 ? 1 : 4);
-    });
-  } catch {
-    return false;
-  }
-}
-
-// For CSS background images (hero, about), which have no <img> to inspect
-function isImageBlocked(src: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onerror = () => resolve(true);
-    img.onload = () => resolve(isMosaic(img));
-    img.src = src;
-  });
-}
-
-// An <img> that stays hidden until it has loaded and passed the filter check, then fades in.
-// A blocked image is reported instead, so the viewer never sees the mosaic or the swap.
-// Callers key it by src, so a replacement starts hidden again.
-function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlocked: (src: string) => void }) {
-  const ref = useRef<HTMLImageElement>(null);
-  const [ready, setReady] = useState(false);
-  const check = useCallback(() => {
-    const img = ref.current;
-    if (!img) return;
-    if (img.naturalWidth === 0 || isMosaic(img)) { onBlocked(src); return; }
-    // Lets the gallery's justified rows size the tile to the photo
-    (img.closest<HTMLElement>(".gallery-tile") ?? img.parentElement)?.style.setProperty("--ratio", String(img.naturalWidth / img.naturalHeight));
-    setReady(true);
-  }, [src, onBlocked]);
-  // The image may have finished loading before hydration attached onLoad
-  useEffect(() => {
-    if (!ref.current?.complete) return;
-    const frame = requestAnimationFrame(check);
-    return () => cancelAnimationFrame(frame);
-  }, [check]);
-  return <img ref={ref} src={src} alt={alt} loading="lazy" data-checked className={ready ? "is-ready" : undefined} onLoad={check} onError={() => onBlocked(src)} />;
-}
+const collageShapes = collagePhotoTiles.map((tile) => tile.shape);
 
 // Placeholder quotes: replace with real testimonials before going live.
 const testimonials = [
@@ -188,102 +57,30 @@ const testimonials = [
   { quote: "הבת שלי לא אוהבת להצטלם. אחרי עשר דקות היא כבר צחקה, והתמונות יצאו הכי היא שיש.", author: "[שם הלקוחה]", type: "בת מצווה" },
 ];
 
-const faqs = [
-  { q: "איפה מצלמים?", a: "בבית שלכם, בסטודיו או בחוץ — בפארק, בחורשה או בכל מקום שיש לו משמעות בשבילכם. נבחר יחד בשיחת ההיכרות, לפי האור, העונה והגיל של הילדים." },
-  { q: "מה כדאי ללבוש?", a: "בגדים נוחים בגוונים רכים שמשתלבים זה עם זה, בלי הדפסים גדולים ולוגואים. לפני הצילום תקבלו ממני רשימה מסודרת עם דוגמאות." },
-  { q: "ומה אם הילדים לא ישתפו פעולה?", a: "זה חלק מהתכנון. אני לא מבקשת מהם לחייך למצלמה, אלא נותנת להם זמן, משחק ומרחב — ומשם בדרך כלל מגיעות התמונות הכי יפות." },
-  { q: "אפשר לצלם את החלאקה עצמה, באירוע?", a: "כן. אפשר לצלם את התספורת עצמה, בבית או באירוע, וגם סשן נפרד לפני או אחרי — כשהכיפה והציציות עוד חדשות." },
-  { q: "תוך כמה זמן מקבלים את התמונות?", a: "בדרך כלל תוך שבועיים עד שלושה, בגלריה דיגיטלית מסודרת שאפשר להוריד ממנה ולשתף עם כל המשפחה." },
-  { q: "איך שומרים תאריך?", a: "ממלאים את הטופס למטה, ואני חוזרת אליכם לשיחה קצרה. נדבר על מה שחשוב לכם ונקבע מועד. בעונות עמוסות כדאי לפנות מוקדם." },
-];
-
 const pricingPlans = [
   {
-    name: "מיני סשן",
-    price: "1,990 ₪",
-    description: "קצר וממוקד: לילד אחד, לשנה הראשונה או למשפחה קטנה.",
-    features: ["45 דק' צילום", "20 תמונות ערוכות", "גלריה דיגיטלית להורדה"],
+    name: "חבילת מיני",
+    price: "לפי שיחה",
+    description: "קצר וממוקד: חבילה קטנה לילד אחד או למשפחה קטנה.",
+    features: ["צילום קצר", "אלבום דיגיטלי להורדה"],
   },
   {
-    name: "סשן משפחתי",
-    price: "3,490 ₪",
+    name: "חבילה בסיסית",
+    price: "לפי שיחה",
     description: "הבחירה של רוב המשפחות: זמן להתחמם, לשחק ולתת לתמונות הטובות לקרות.",
-    features: ["90 דק' צילום", "50+ תמונות ערוכות", "גלריה דיגיטלית מלאה"],
+    features: ["צילום משפחה או ילדים", "25 תמונות להורדה"],
     featured: true,
   },
   {
-    name: "חלאקה / בת מצווה",
-    price: "5,990 ₪",
-    description: "ליווי מלא של היום המיוחד — מההכנות ועד הרגע שכולם מחכים לו.",
-    features: ["שעתיים צילום", "עריכה מלאה", "אלבום מעוצב"],
+    name: "חבילת פרימיום",
+    price: "לפי שיחה",
+    description: "ליווי מלא ותוצר שנשאר איתכם: מההכנות ועד הרגע שכולם מחכים לו.",
+    features: ["הגדלה במתנה", "4 תמונות נוספות אחרי התספורת"],
   },
 ];
 
-const MIN_GALLERY_TILES = 3;
-
-function YouTubeVideo({ id, title }: { id: string; title: string }) {
-  const [playing, setPlaying] = useState(false);
-
-  if (playing) {
-    return (
-      <div className="video-frame">
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`}
-          title={title}
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
-        />
-      </div>
-    );
-  }
-
-  return (
-    <button type="button" className="video-frame video-poster" onClick={() => setPlaying(true)} aria-label={`הפעלת הקליפ: ${title}`}>
-      <img src={`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`} alt="" loading="lazy" />
-      <span className="video-play"><Play size={26} strokeWidth={1.5} fill="currentColor" aria-hidden="true" /></span>
-    </button>
-  );
-}
-
-function Lightbox({ images, index, onClose, onMove }: { images: GalleryImage[]; index: number; onClose: () => void; onMove: (step: number) => void }) {
-  useEffect(() => {
-    const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-      // RTL: the left arrow moves forward
-      if (event.key === "ArrowLeft") onMove(1);
-      if (event.key === "ArrowRight") onMove(-1);
-    };
-    document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose, onMove]);
-
-  const image = images[index];
-
-  return (
-    <div className="lightbox" role="dialog" aria-modal="true" aria-label={image.alt} onClick={onClose}>
-      <button type="button" className="lightbox-close" onClick={onClose} aria-label="סגירה"><X size={26} strokeWidth={1.25} /></button>
-      <figure className="lightbox-figure" onClick={(event) => event.stopPropagation()}>
-        <img key={image.src} src={image.src} alt={image.alt} />
-        <figcaption>{image.alt}<span dir="ltr">{index + 1} / {images.length}</span></figcaption>
-      </figure>
-      {images.length > 1 && (
-        <>
-          <button type="button" className="lightbox-nav lightbox-prev" onClick={(event) => { event.stopPropagation(); onMove(-1); }} aria-label="התמונה הקודמת"><ChevronRight size={30} strokeWidth={1.25} /></button>
-          <button type="button" className="lightbox-nav lightbox-next" onClick={(event) => { event.stopPropagation(); onMove(1); }} aria-label="התמונה הבאה"><ChevronLeft size={30} strokeWidth={1.25} /></button>
-        </>
-      )}
-    </div>
-  );
-}
-
 export default function Home() {
-  const [activeTab, setActiveTab] = useState(galleryCollections[0].id);
   const [lightbox, setLightbox] = useState<{ images: GalleryImage[]; index: number } | null>(null);
-  const activeCollection = galleryCollections.find((collection) => collection.id === activeTab) ?? galleryCollections[0];
   const [blockedImages, setBlockedImages] = useState<ReadonlySet<string>>(() => new Set());
   // Background photos (hero, about) that have been checked and may be shown
   const [readyBackgrounds, setReadyBackgrounds] = useState<ReadonlySet<string>>(() => new Set());
@@ -305,9 +102,11 @@ export default function Home() {
     });
   };
 
-  const galleryImages = replaceBlocked(activeCollection.images);
-  const placeholderCount = Math.max(0, MIN_GALLERY_TILES - galleryImages.length);
   const collagePhotos = replaceBlocked(collagePhotoTiles, collageShapes);
+  // The first photo of each collection leads its session block
+  const sessionList = sessions.map((session) => ({ ...session, photo: replaceBlocked(galleryCollections.find((collection) => collection.id === session.id)?.images ?? [])[0] }));
+  const marqueeSlots = collagePhotos.map((photo, slot) => ({ photo, slot }));
+  const marqueeRows = [marqueeSlots.filter((_, i) => i % 2 === 0), marqueeSlots.filter((_, i) => i % 2 === 1)];
 
   useEffect(() => {
     let cancelled = false;
@@ -324,11 +123,6 @@ export default function Home() {
     }
     return () => { cancelled = true; };
   }, [markBlocked]);
-
-  const openSession = (id: string) => {
-    setActiveTab(id);
-    document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const closeLightbox = () => setLightbox(null);
   const moveLightbox = (step: number) =>
@@ -353,17 +147,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main dir="rtl" className="overflow-hidden bg-[var(--cream)] text-[var(--ink)]">
+    <main dir="rtl" className="overflow-x-clip bg-[var(--cream)] text-[var(--ink)]">
       <SkipLinks />
-      <header className="relative z-20 border-b border-[var(--line)] bg-[var(--cream)] text-[var(--ink)]">
-        <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 sm:px-10 lg:px-16">
-          <a href="#top" className="brand-logo brand-logo-header" aria-label="MB Photographer — דף הבית"><img src="/images/logo-light.png" alt="MB Photographer" /></a>
-          <nav className="header-nav hidden items-center gap-7 text-sm lg:flex" aria-label="ניווט ראשי">
-            <a href="#portfolio">עבודות</a><a href="#sessions">סוגי צילום</a><a href="#about">אודות</a><a href="#testimonials">המלצות</a><a href="#pricing">מחירון</a><a href="#faq">שאלות</a><a href="#contact">יצירת קשר</a>
-          </nav>
-          <a href="tel:+972548520516" className="header-cta">לתיאום צילום: מירית <span dir="ltr">054-8520516</span></a>
-        </div>
-      </header>
+      <SiteHeader home />
 
       <section id="top" className="hero-section">
         <div className="hero-grid">
@@ -371,29 +157,29 @@ export default function Home() {
             <p className="eyebrow mb-7">צילום משפחה · חלאקה · בת מצווה</p>
             <h1 className="display-title">הרגעים הקטנים<br />הם הסיפור.</h1>
             <p className="hero-lead mt-7 max-w-lg text-[1.05rem] leading-8 sm:text-lg">צילום טבעי ורגוע, באור רך ובקצב של הילדים — תמונות שיישארו הרבה אחרי שהבגדים כבר יהיו קטנים.</p>
-            <a href="#portfolio" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
+            <a href="/gallery" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
           </div>
           <div className="hero-media">
-            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""} ${readyBackgrounds.has(HERO_SRC) ? "is-ready" : ""}`} role="img" aria-label="שתי אחיות בכובעים מחייכות בין חבילות קש" />
+            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""} ${readyBackgrounds.has(HERO_SRC) ? "is-ready" : ""}`} role="img" aria-label="ארבעה אחים הולכים יד ביד בשביל עפר ליד סוס" />
           </div>
         </div>
       </section>
 
-      <section id="about" className="reveal-section bg-[var(--espresso)] text-white">
-        <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
-          <div className="about-photo relative min-h-[520px] lg:min-h-[760px]">
+      <section id="about" className="reveal-section about-section text-white">
+        <div className="about-card mx-auto grid lg:grid-cols-2">
+          <div className="about-photo relative min-h-[340px] lg:min-h-[540px]">
             <div className={`about-photo-image ${isBlocked(ABOUT_SRC) ? "is-filtered" : ""} ${readyBackgrounds.has(ABOUT_SRC) ? "is-ready" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
           </div>
-          <div className="reveal-copy flex items-center px-6 py-20 sm:px-14 lg:px-20 lg:py-24">
+          <div className="reveal-copy flex items-center px-6 py-12 sm:px-10 lg:px-14 lg:py-14">
             <div className="max-w-xl">
               <img src="/images/logo-light.png" alt="MB Photographer" className="about-logo" />
-              <p className="eyebrow mt-8 text-[var(--honey-light)]">נעים להכיר</p>
-              <h2 className="section-title mt-5 text-white">היי, אני מירית.</h2>
-              <div className="mt-8 space-y-5 text-base leading-8 text-white/70 sm:text-lg">
-                <p>מאחורי המצלמה של MB Photographer עומדת אני. אני מצלמת משפחות, חלאקות ובנות מצווה, ומלווה כל משפחה מהשיחה הראשונה ועד שהתמונות מגיעות אליה הביתה.</p>
-                <p>הכי חשוב לי שתרגישו בנוח. אני לא מבקשת מאף אחד לחייך — אני נותנת לילדים להתרגל, להורים להשתחרר, ומחכה לרגע האמיתי שמגיע מעצמו.</p>
+              <p className="eyebrow mt-6 text-[var(--honey-light)]">נעים להכיר</p>
+              <h2 className="section-title mt-5 text-white">שלום, אני מירית.</h2>
+              <div className="mt-6 space-y-4 text-[.95rem] leading-7 text-white/70">
+                <p>אני מירית, צלמת ילדים ומשפחה מבני ברק, עם אהבה גדולה לצילום ולתקשורת עם ילדים. אני מצלמת ומסריטה משפחות, חלאקות ובנות מצווה, ומלווה אתכם מרגע שיחת ההכרות ועד התוצר המושלם אצלכם בבית: תמונות ואלבום שלא מפסיקים לדפדף בו.</p>
+                <p>הילדים שלכם הם ההנאה שלי! אני יוצרת רגעים מיוחדים איתם ותופסת אותם ברגע הכי משוחרר והכי טוב, כדי שתקבלו את המזכרת המושלמת והמקצועית ביותר.</p>
               </div>
-              <a href="#contact" className="dark-link mt-10 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
+              <a href="#contact" className="dark-link mt-8 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
             </div>
           </div>
         </div>
@@ -405,102 +191,33 @@ export default function Home() {
             <p className="section-kicker">השראה</p>
             <h2 className="section-title mt-4">לתפוס את הרגע</h2>
           </div>
-          <div className="collage">
-            {collageTiles.map((tile) => {
-              const style = { "--area-d": tile.d, "--area-m": tile.m, "--order": tile.order } as CSSProperties;
-              if (tile.kind === "word") {
-                const wordStyle = { ...style, "--word": collageWords.indexOf(tile.text) } as CSSProperties;
-                return <div key={tile.text} className="collage-tile collage-word" style={wordStyle}><span>{tile.text}</span></div>;
-              }
-              if (tile.kind === "link") {
-                return (
-                  <a key="link" href="#portfolio" className="collage-tile collage-link" style={style}>
-                    <span>לכל העבודות</span>
-                    <ArrowLeft size={20} strokeWidth={1.25} aria-hidden="true" />
-                  </a>
-                );
-              }
-              const slot = collagePhotoTiles.indexOf(tile);
-              const photo = collagePhotos[slot];
-              return (
-                <button key={tile.src} type="button" className="collage-tile collage-photo" style={style} onClick={() => setLightbox({ images: collagePhotos, index: slot })} aria-label={`הגדלת התמונה: ${photo.alt}`}>
-                  <CheckedImage key={photo.src} src={photo.src} alt={photo.alt} onBlocked={markBlocked} />
-                </button>
-              );
-            })}
+          <div className="marquee-wrap">
+          <div className="marquee" role="group" aria-label="תמונות מהצילומים">
+            {[marqueeRows[0], marqueeRows[1]].map((row, rowIndex) => (
+              <div key={rowIndex} className={`marquee-row ${rowIndex === 1 ? "marquee-reverse" : ""}`}>
+                <div className="marquee-track">
+                  {[0, 1].map((copy) => (
+                    <div key={copy} className="marquee-set" aria-hidden={copy === 1 ? true : undefined}>
+                      {row.map(({ photo, slot }) => (
+                        <button key={`${slot}-${copy}`} type="button" className="marquee-tile" tabIndex={copy === 1 ? -1 : undefined} onClick={() => setLightbox({ images: collagePhotos, index: slot })} aria-label={copy === 1 ? undefined : `הגדלת התמונה: ${photo.alt}`}>
+                          <CheckedImage key={photo.src} src={photo.src} alt={copy === 1 ? "" : photo.alt} onBlocked={markBlocked} />
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <a href="/gallery" className="marquee-orb"><span>לגלריה<br />המלאה</span><ArrowLeft size={20} strokeWidth={1.5} aria-hidden="true" /></a>
           </div>
         </div>
       </section>
 
       <section id="sessions" className="reveal-section sessions-wrap">
         <div className="mx-auto max-w-[1320px] px-5 py-24 sm:px-10 lg:px-16 lg:py-32">
-          <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-24">
-            <div><p className="section-kicker">סוגי צילום</p><h2 className="section-title mt-4">מה נצלם יחד?</h2></div>
-            <div className="session-list">
-              {sessions.map((session) => (
-                <article key={session.number} className="session-item reveal-item">
-                  <span>{session.number}</span>
-                  <h3>{session.title}</h3>
-                  <p>{session.text}</p>
-                  <button type="button" onClick={() => openSession(session.id)} className="session-arrow" aria-label={`לעבודות ${session.title}`}>
-                    <ArrowLeft size={20} strokeWidth={1.25} aria-hidden="true" />
-                  </button>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="portfolio" className="reveal-section gallery-wrap">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-10 lg:px-16">
-          <div className="gallery-head">
-            <div>
-              <p className="section-kicker">עבודות</p>
-              <h2 className="section-title mt-4">סיפורים באור טבעי</h2>
-            </div>
-            <div className="gallery-tabs" role="tablist" aria-label="סוג צילום">
-              {galleryCollections.map((collection) => (
-                <button
-                  key={collection.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={collection.id === activeTab}
-                  className="gallery-tab"
-                  onClick={() => setActiveTab(collection.id)}
-                >
-                  {collection.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div key={activeCollection.id} className="gallery-panel" role="tabpanel">
-            <div className="gallery-intro">
-              <h3>{activeCollection.title}</h3>
-              <p>{activeCollection.summary}</p>
-            </div>
-
-            {activeCollection.youtubeId && (
-              <div className="gallery-video">
-                <YouTubeVideo id={activeCollection.youtubeId} title={activeCollection.title} />
-              </div>
-            )}
-
-            <div className="gallery-masonry">
-              {galleryImages.map((image, index) => (
-                <button key={`${activeCollection.id}-${index}`} type="button" className="gallery-tile" onClick={() => setLightbox({ images: galleryImages, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
-                  <span className="gallery-tile-media"><CheckedImage key={image.src} src={image.src} alt={image.alt} onBlocked={markBlocked} /></span>
-                  <span className="gallery-tile-zoom" aria-hidden="true"><Plus size={20} strokeWidth={1.25} /></span>
-                </button>
-              ))}
-              {Array.from({ length: placeholderCount }, (_, index) => (
-                <div key={`placeholder-${index}`} className="gallery-tile gallery-tile-placeholder">
-                  <div className="image-placeholder"><span>{activeCollection.label} · תמונה תתווסף כאן</span></div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <div className="mb-14 text-center"><p className="section-kicker">סוגי צילום</p><h2 className="section-title mt-4">מה נצלם יחד?</h2></div>
+          <SessionsShowcase sessions={sessionList} onBlocked={markBlocked} />
         </div>
       </section>
 
@@ -557,20 +274,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="faq" className="reveal-section faq-section">
-        <div className="mx-auto grid max-w-[1320px] gap-12 px-5 py-24 sm:px-10 lg:grid-cols-[0.65fr_1.35fr] lg:gap-24 lg:px-16 lg:py-32">
-          <div><p className="section-kicker">לפני שמתחילים</p><h2 className="section-title mt-4">שאלות נפוצות</h2></div>
-          <div className="faq-list">
-            {faqs.map((item, index) => (
-              <details key={item.q} className="faq-item stagger-item" style={{ "--i": index } as CSSProperties}>
-                <summary>{item.q}<Plus size={20} strokeWidth={1.25} aria-hidden="true" /></summary>
-                <p>{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section id="contact" className="reveal-section contact-section">
         <div className="contact-shell mx-auto max-w-[1400px] px-5 py-24 sm:px-10 lg:px-16 lg:py-36">
           <div className="contact-heading">
@@ -588,7 +291,7 @@ export default function Home() {
               </div>
               <div className="contact-details">
                 {/* Shown only for now: not a mailto link until the site goes live */}
-                <span><Mail size={17} strokeWidth={1.5} /><span dir="ltr">mirelmark2@gmail.com</span></span>
+                <span><Mail size={17} strokeWidth={1.5} /><span dir="ltr">miritb054@gmail.com</span></span>
                 <a href="tel:+972548520516"><Phone size={17} strokeWidth={1.5} /><span dir="ltr">054-8520516</span></a>
               </div>
             </aside>
@@ -606,26 +309,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="footer-inner mx-auto max-w-[1500px] px-5 sm:px-10 lg:px-16">
-          <a href="#top" className="brand-logo brand-logo-footer" aria-label="MB Photographer — חזרה לראש העמוד"><img src="/images/logo-light.png" alt="MB Photographer" /></a>
-          <div className="footer-legal">
-            <A11yMenu />
-            <span aria-hidden="true">|</span>
-            <LegalDialog label="הצהרת נגישות" title="הצהרת נגישות"><AccessibilityStatement /></LegalDialog>
-            <span aria-hidden="true">|</span>
-            <LegalDialog label="מדיניות פרטיות" title="מדיניות פרטיות"><PrivacyPolicy /></LegalDialog>
-          </div>
-          <p className="footer-rights">
-            <span>© 2026 MB Photographer. כל הזכויות שמורות</span>
-            <span aria-hidden="true">|</span>
-            <span className="footer-credit">
-              עיצוב ובנייה -
-              <a href="https://ajenda-studio.ajendastudio.workers.dev" target="_blank" rel="noopener" className="studio-mark" dir="ltr" aria-label="AJenda Studio — עיצוב ובניית אתרים"><span className="br">{"{"}</span>AJ<span className="br">{"}"}</span>enda</a>
-            </span>
-          </p>
-        </div>
-      </footer>
+      <SiteFooter home />
     </main>
   );
 }

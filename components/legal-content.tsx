@@ -2,7 +2,7 @@ const UPDATED = "אוקטובר 2026";
 const PHONE = "+972548520516";
 const PHONE_LABEL = "054-8520516";
 // Shown as text only for now, like the contact section: not a mailto link until the site goes live
-const EMAIL = "mirelmark2@gmail.com";
+const EMAIL = "miritb054@gmail.com";
 
 export function AccessibilityStatement() {
   return (

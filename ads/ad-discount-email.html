@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>מודעה למייל - 15% הנחה</title>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@300;400;600;700&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#f6f1ea;--sand:#ece3d6;--ink:#2a221d;--espresso:#2e2620;--espresso-deep:#1f1915;--honey:#b07a3e;--honey-text:#8a5a28;--honey-light:#dcbf94;--muted:#6b6058;--line:#d3c6b5}
+*{box-sizing:border-box;margin:0}
+html,body{width:1080px;height:1206px;background:var(--cream);font-family:"Assistant","Segoe UI",Arial,sans-serif;color:var(--ink)}
+.ad{position:relative;width:1080px;height:1206px;overflow:hidden;background:var(--cream)}
+.top{height:96px;display:flex;align-items:center;justify-content:space-between;padding:0 64px}
+.top img{height:64px;filter:brightness(.18)}
+.top span small{display:block;margin-top:4px;font-size:20px;font-weight:400;color:var(--muted);direction:ltr;text-align:right}
+.top span{font-size:24px;font-weight:600;color:var(--honey-text);letter-spacing:.02em}
+.photo{position:relative;width:1080px;height:700px;background:url("../public/images/mirit/mirit-01.jpg") center/cover;filter:saturate(.7) contrast(1.05)}
+.coupon-wrap{position:absolute;left:56px;top:662px;transform:rotate(-6deg);filter:drop-shadow(0 14px 22px rgba(0,0,0,.35))}
+.coupon{position:relative;width:310px;height:200px;background:var(--espresso);color:#fffdf7;display:flex;flex-direction:column;align-items:center;justify-content:center;-webkit-mask:radial-gradient(circle 18px at 0 50%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 18px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 18px at 0 50%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 18px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat}
+.coupon::before{content:"";position:absolute;inset:12px 26px;border:2.5px dashed var(--honey-light);opacity:.85}
+.coupon .lbl{font-family:"Suez One","Assistant",sans-serif;font-weight:400;font-size:30px;letter-spacing:.14em;color:var(--honey-light);line-height:1}
+.coupon b{font-family:"Suez One","Assistant",sans-serif;font-weight:400;font-size:84px;line-height:1;color:#fffdf7;margin:2px 0}
+.coupon .off{font-family:"Suez One","Assistant",sans-serif;font-weight:400;font-size:34px;line-height:1;color:var(--honey-light);letter-spacing:.1em}
+.copy{padding:38px 64px 0 340px;text-align:right}
+.kicker{font-size:27px;font-weight:700;color:var(--honey-text);letter-spacing:.02em;line-height:1}
+h1{font-family:"Suez One","Assistant",sans-serif;font-weight:400;font-size:54px;line-height:1.2;margin-top:12px;color:var(--espresso)}
+.terms{position:absolute;right:64px;left:64px;top:1026px;font-size:29px;line-height:1.5;color:var(--muted);border-top:1px solid var(--line);padding-top:26px}
+.terms b{color:var(--ink);font-weight:600}
+.foot{position:absolute;inset-inline:0;bottom:0;height:144px;background:var(--honey);color:var(--espresso-deep);display:flex;align-items:center;justify-content:space-between;padding:0 64px}
+.foot .cta{font-family:"Suez One","Assistant",sans-serif;font-size:50px;line-height:1.1;color:#fff}
+.foot .who{display:flex;align-items:center;gap:18px}
+.foot .who .cta{color:var(--espresso-deep)}
+.foot .cta em{font-style:normal;color:var(--espresso-deep);margin-inline-start:14px}
+.foot .tel{font-family:"Suez One","Assistant",sans-serif;font-size:50px;line-height:1;background:var(--espresso-deep);color:var(--honey-light);padding:18px 30px;direction:ltr;letter-spacing:.03em}
+</style>
+</head>
+<body>
+<div class="ad">
+  <div class="top">
+    <img src="../public/images/logo-light.png" alt="MB Photographer">
+    <span>צילום משפחה · חלאקה · בת מצווה<small>לתיאום צילום: מירית 054-8520516</small></span>
+  </div>
+  <div class="photo" role="img" aria-label="ארבעה אחים הולכים יד ביד בשביל עפר ליד סוס"></div>
+  <div class="coupon-wrap"><div class="coupon"><span class="lbl">קופון</span><b>15%</b><span class="off">הנחה</span></div></div>
+  <div class="copy">
+    <p class="kicker">מבצע מיוחד למצולמים לשעבר</p>
+    <h1>היה כיף, זוכרים?<br>עכשיו הזמן להכיר לאחרים!</h1>
+  </div>
+  <p class="terms"><b>אני בונה אתר חדש, וצריכה את שיתוף הפעולה שלכם.</b><br>תמורת אישור פרסום התמונות ושליחת המלצה,<br>תקבלו 15% הנחה על יום הצילומים הבא שלכם.</p>
+  </div>
+</body>
+</html>
